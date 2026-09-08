@@ -15,6 +15,7 @@ load_dotenv(ROOT_DIR / '.env')
 from lib.db import client, db, ensure_indexes
 from routers.auction import bids_router, router as auction_router
 from routers.admin import router as admin_router
+from routers.admin_auth import router as admin_auth_router
 from routers.marketplace import buyers_router, wishlist_router
 
 
@@ -43,6 +44,7 @@ api_router.include_router(bids_router)
 api_router.include_router(buyers_router)
 api_router.include_router(wishlist_router)
 api_router.include_router(admin_router)
+api_router.include_router(admin_auth_router)
 
 app.add_middleware(
     CORSMiddleware,

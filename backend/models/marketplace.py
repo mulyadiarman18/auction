@@ -36,6 +36,7 @@ class BuyerProfile(BaseModel):
     reviewed_at: datetime | None = None
     reviewed_by: str | None = None
     review_reason: str | None = None
+    resubmission_required: bool = False
 
 
 class BuyerVerificationUpdate(BaseModel):
@@ -48,6 +49,16 @@ class BuyerVerificationUpdate(BaseModel):
         if self.verification_status == "REJECTED" and len(self.reason.strip()) < 5:
             raise ValueError("Alasan penolakan minimal 5 karakter")
         return self
+
+
+class BuyerResubmissionUpdate(BaseModel):
+    full_name: str = Field(min_length=2, max_length=100)
+    email: str = Field(min_length=5, max_length=120)
+    phone: str = Field(min_length=8, max_length=30)
+    identity_number: str = Field(min_length=5, max_length=40)
+    company_name: str | None = Field(default=None, max_length=120)
+    tax_number: str = Field(default="", max_length=40)
+    address: str = Field(min_length=5, max_length=240)
 
 
 class BuyerDocument(BaseModel):
@@ -77,6 +88,24 @@ class AdminAuditLog(BaseModel):
     new_status: str
     reason: str
     created_at: datetime
+
+
+class AdminUserPublic(BaseModel):
+    id: str
+    username: str
+    name: str
+    role: Literal["super_admin", "reviewer"]
+    is_active: bool = True
+
+
+class AdminLoginRequest(BaseModel):
+    username: str = Field(min_length=3, max_length=80)
+    password: str = Field(min_length=8, max_length=120)
+
+
+class AdminSessionResponse(BaseModel):
+    user: AdminUserPublic
+    expires_at: datetime
 
 
 class WishlistToggleRequest(BaseModel):

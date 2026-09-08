@@ -122,6 +122,29 @@ export interface AdminAuditLog {
   created_at: string;
 }
 
+export interface AdminUser {
+  id: string;
+  username: string;
+  name: string;
+  role: AdminRole;
+  is_active: boolean;
+}
+
+export interface AdminSessionResponse {
+  user: AdminUser;
+  expires_at: string;
+}
+
+export interface BuyerResubmissionUpdate {
+  full_name: string;
+  email: string;
+  phone: string;
+  identity_number: string;
+  company_name: string;
+  tax_number: string;
+  address: string;
+}
+
 export interface AdminSummary {
   total_lots: number;
   live_lots: number;

@@ -29,3 +29,6 @@ Six demo lots are written by `backend/seed.py`: live Porsche 911 GT3 RS and Audi
 - Demo admin roles are `super_admin` (inventory, schedule, outcomes, approvals) and `reviewer` (approvals only). Backend routes enforce the selected role, though authentication itself remains mocked.
 - Rejections require a reason. Every approval decision stores reviewer identity, timestamp, previous/new status, and reason in `admin_audit_logs`.
 - Bidder dashboard resolves the selected persona's latest registration and shows an `INCOMPLETE`, `PENDING`, `APPROVED`, or `REJECTED` status alert.
+- Admin routes now require a Mongo-backed HTTP-only session created by `/api/admin/auth/login`; role comes from the authenticated account, not a client selector.
+- Rejected bidders can open `/resubmit/{buyerId}` from the dashboard, correct their data, upload a replacement identity document, and return to `PENDING` after screening.
+- Reviewer document links open PDF/JPG/PNG inside an authenticated modal preview rather than downloading immediately.

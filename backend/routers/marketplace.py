@@ -9,6 +9,7 @@ from lib.db import db
 from models.marketplace import (
     BuyerProfile,
     BuyerRegistrationCreate,
+    BuyerResubmissionUpdate,
     BuyerDocument,
     BuyerStatusResponse,
     WishlistItem,
@@ -34,6 +35,8 @@ def screen_buyer(document: dict) -> tuple[str, list[str]]:
         issues.append("Dokumen identitas belum diunggah")
     if document.get("buyer_type") == "company" and "company_document" not in document_types:
         issues.append("Dokumen perusahaan belum diunggah")
+    if document.get("resubmission_required"):
+        issues.append("Dokumen perbaikan belum diunggah")
     return ("READY" if not issues else "INCOMPLETE", issues)
 
 
@@ -90,12 +93,33 @@ async def upload_buyer_document(
     )
     documents = [item for item in buyer.get("documents", []) if item.get("document_type") != document_type]
     documents.append(document.model_dump())
-    updated = buyer | {"documents": documents}
+    updated = buyer | {"documents": documents, "resubmission_required": False}
     screening_status, screening_issues = screen_buyer(updated)
     verification_status = "PENDING" if screening_status == "READY" else "INCOMPLETE"
-    await db.buyers.update_one({"id": buyer_id}, {"$set": {"documents": documents, "screening_status": screening_status, "screening_issues": screening_issues, "verification_status": verification_status}})
+    await db.buyers.update_one({"id": buyer_id}, {"$set": {"documents": documents, "screening_status": screening_status, "screening_issues": screening_issues, "verification_status": verification_status, "resubmission_required": False, "reviewed_at": None, "reviewed_by": None, "review_reason": None}})
     updated_document = await db.buyers.find_one({"id": buyer_id})
     return BuyerProfile(**updated_document)
+
+
+@buyers_router.put("/{buyer_id}/resubmit", response_model=BuyerProfile)
+async def resubmit_buyer(buyer_id: str, input: BuyerResubmissionUpdate):
+    buyer = await db.buyers.find_one({"id": buyer_id})
+    if not buyer:
+        raise HTTPException(status_code=404, detail="Data peserta tidak ditemukan")
+    if buyer.get("verification_status") not in {"REJECTED", "INCOMPLETE"}:
+        raise HTTPException(status_code=400, detail="Pengajuan ini tidak dapat dikirim ulang")
+    values = input.model_dump() | {
+        "email": input.email.strip().lower(),
+        "verification_status": "INCOMPLETE",
+        "screening_status": "INCOMPLETE",
+        "screening_issues": ["Dokumen perbaikan belum diunggah"],
+        "resubmission_required": True,
+        "reviewed_at": None,
+        "reviewed_by": None,
+    }
+    await db.buyers.update_one({"id": buyer_id}, {"$set": values})
+    document = await db.buyers.find_one({"id": buyer_id})
+    return BuyerProfile(**document)
 
 
 @buyers_router.get("/{buyer_id}", response_model=BuyerProfile)

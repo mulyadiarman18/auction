@@ -1,0 +1,89 @@
+{
+  "iteration": 2,
+  "summary": "8/8 acceptance criteria exercised via 3 new backend test files (plus 1 pre-existing, updated for real auth) + 7 new browser checks. All 10 new/updated artifacts passed.",
+  "passed": 10,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [
+    "note: real admin session cookie is Secure=true (correct for the https preview deployment). httpx's RFC-6265 cookie jar will not resend a Secure cookie over plain http://localhost, unlike a browser which treats localhost as a secure context. Backend tests work around this by extracting the token from the Set-Cookie response and attaching it manually via the Cookie header on subsequent requests (see backend/tests/conftest.py::admin_login/login_as). Not an application bug, but worth knowing for future backend test authors."
+  ],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Admin route dilindungi login nyata",
+      "name": "admin-login-flow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Unauthenticated /admin redirects to admin-login-page; wrong password shows admin-login-error and stays on /admin/login; correct superadmin credentials land on admin-page at /admin."
+    },
+    {
+      "criterion": "Admin route dilindungi login nyata",
+      "name": "test_tscheck_admin_login_session.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/admin/lots without cookie -> 401; POST /api/admin/auth/login (superadmin) -> 200 + session cookie, GET /api/admin/auth/me -> 200 username=superadmin, GET /api/admin/lots with cookie -> 200; wrong password -> 401/422 with no session cookie issued."
+    },
+    {
+      "criterion": "Reviewer hanya dapat review peserta",
+      "name": "reviewer-role-restricts-inventory",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Login reviewer -> admin-role-locked text 'Reviewer'; reviewer-restriction-card visible; admin-lots-section and admin-winners-section count 0."
+    },
+    {
+      "criterion": "Reviewer hanya dapat review peserta",
+      "name": "test_tscheck_reviewer_forbidden_lot.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "Reviewer session: PATCH /api/admin/lots/{id} -> 403, GET /api/admin/lots -> 403. Same lot with Super Admin session: PATCH -> 200."
+    },
+    {
+      "criterion": "Super Admin memiliki akses penuh",
+      "name": "superadmin-full-access",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Login superadmin -> admin-role-locked text 'Super Admin'; admin-lots-section and admin-winners-section visible; admin-approval-queue-link opens /admin/approvals with same Super Admin badge."
+    },
+    {
+      "criterion": "Role tidak dapat dipilih bebas",
+      "name": "role-persists-after-refresh-no-switcher",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "admin-role-locked is a static <div> (not button/select), no role-switch/combobox controls exist; after page.reload() role remains 'Reviewer' and reviewer-restriction-card stays visible."
+    },
+    {
+      "criterion": "Preview dokumen tampil dalam modal",
+      "name": "document-preview-opens-modal",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Fixture buyer registered + PNG uploaded via API; reviewer opens admin-document-preview button, no browser download event fires, document-preview-modal + document-preview-image render inline; document-preview-close removes the modal."
+    },
+    {
+      "criterion": "Audit memakai identitas akun login",
+      "name": "test_tscheck_audit_uses_session_identity.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "PATCH /api/admin/buyers/{id} sent with body admin_name='Spoofed Fake Admin' while authenticated as reviewer; resulting /api/admin/audit-logs entry has admin_name='Raka Reviewer' (session) and admin_role='reviewer', never the spoofed client value."
+    },
+    {
+      "criterion": "Bidder ditolak dapat resubmit",
+      "name": "bidder-resubmit-after-rejection",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Fixture buyer registered/uploaded/rejected via API; /dashboard shows dashboard-resubmission-link ('Perbaiki pengajuan'); resubmission-form pre-filled, address edited, new PDF uploaded, submit shows resubmission-success with status PENDING; GET /api/buyers/{id} confirms verification_status=PENDING."
+    },
+    {
+      "criterion": "Logout mengakhiri session",
+      "name": "logout-ends-session",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Clicking admin-logout-button from /admin returns to admin-login-page; subsequent page.goto('/admin') redirects to /admin/login again (session cleared)."
+    }
+  ],
+  "notes": [
+    "Matrix has 8 criteria; 10 artifacts produced (7 browser + 3 backend) because criteria 1 and 2 are both UI-facing and API-bearing, each getting a browser check plus a backend test.",
+    "Removed stale artifacts from a prior generation that referenced an old, superseded design (client-selectable admin_role query param, AdminRoleBar as an interactive switcher, MarketplaceAdminApprovals V1/V2 without document preview/audit). Current code (AdminGuard, AdminLogin, MarketplaceAdminV2, MarketplaceAdminApprovalsV3, AdminRoleBar-as-locked-badge) matches the new briefing; stale checks/tests referencing the old behavior were deleted and replaced.",
+    "test_tscheck_incomplete_not_queued.py (pre-existing, not tied to current 8-criteria matrix) was updated to authenticate via the new login flow and still passes; register-full-flow-completes-screening (pre-existing browser check, also outside current matrix) re-run and still passes.",
+    "Backend session cookie is Secure=true, correct for the https preview deployment; httpx (unlike browsers) won't resend a Secure cookie over http://localhost, so backend tests attach the session token manually via the Cookie header after login (see conftest.py). This is documented in action_items as context, not a bug."
+  ]
+}

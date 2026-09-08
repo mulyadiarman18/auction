@@ -45,3 +45,28 @@ async def aclient():
 
 
 # --- app-specific fixtures below this line ---
+
+SESSION_COOKIE_NAME = "lelangoto_admin_session"
+
+
+@pytest.fixture
+def login_as():
+    return admin_login
+
+
+def admin_login(client: httpx.Client, username: str, password: str) -> dict:
+    """Log in and return {"user": ..., "cookie_header": "name=value"}.
+
+    The app sets its session cookie with Secure=true (correct for the https
+    preview deployment). httpx's cookie jar follows RFC 6265 strictly and
+    will not attach a Secure cookie back on a plain http://localhost
+    request (unlike browsers, which special-case localhost as a secure
+    context). We extract the raw token and attach it manually via the
+    Cookie header so backend tests can exercise the authenticated flow
+    over http://localhost:8001 exactly like the wiring contract requires.
+    """
+    resp = client.post("/admin/auth/login", json={"username": username, "password": password})
+    assert resp.status_code == 200, resp.text
+    token = resp.cookies.get(SESSION_COOKIE_NAME)
+    assert token, "login did not return a session cookie"
+    return {"user": resp.json()["user"], "cookie_header": f"{SESSION_COOKIE_NAME}={token}"}
