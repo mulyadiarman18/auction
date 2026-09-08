@@ -1,0 +1,200 @@
+{
+  "project_name": "LelangOto Premium - Car & Vehicle Auction MVP Blueprint",
+  "archetype": "THE PERFORMANCE PRO x LUXURY EDITORIAL (Premium Automotive Auction)",
+  "emotional_tone": "Exclusive, High-Octane, Precision, Prestigious, Editorial Authority",
+  "theme_strategy": {
+    "default_mode": "dark",
+    "mode_toggle_supported": true,
+    "dark_mode_background": "#0A0E1A (Deep Midnight Navy)",
+    "light_mode_background": "#FAF9F6 (Warm Porcelain Ivory)",
+    "design_rationale": "Automotive luxury & live bidding high-tension environments thrive on deep navy/obsidian canvases accented by vibrant kinetic orange (#FF5E1F) and warm porcelain surfaces for crisp specs legibility."
+  },
+  "typography": {
+    "heading_font": "Syne / Cabinet Grotesk / Cormorant Garamond",
+    "body_font": "Plus Jakarta Sans / Inter",
+    "mono_font": "JetBrains Mono / Space Mono (For Live Bid Timers, Currency, & Lot IDs)",
+    "font_sources_cdn": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Syne:wght@600;700;800&display=swap",
+    "scale_hierarchy": {
+      "h1_hero": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight uppercase leading-none",
+      "h2_section": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight",
+      "h3_card": "text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight",
+      "subtitle": "text-base sm:text-lg text-slate-400 font-normal leading-relaxed",
+      "ticker_numeric": "font-mono font-bold text-2xl sm:text-3xl tracking-wider text-amber-500",
+      "lot_badge": "font-mono text-xs uppercase tracking-[0.2em] font-semibold text-slate-400"
+    }
+  },
+  "colors": {
+    "primary": {
+      "navy_dark": "#0B132B",
+      "navy_void": "#060A17",
+      "navy_surface": "#111A33",
+      "navy_border": "#1E2A4A"
+    },
+    "accent": {
+      "kinetic_orange": "#FF5E1F",
+      "kinetic_orange_hover": "#E0480C",
+      "amber_bid": "#F59E0B",
+      "emerald_live": "#10B981",
+      "crimson_alert": "#EF4444"
+    },
+    "neutral": {
+      "porcelain_light": "#FAF9F6",
+      "warm_white": "#F8F9FA",
+      "slate_muted": "#94A3B8",
+      "card_dark": "rgba(17, 26, 51, 0.75)"
+    },
+    "contrast_rules": {
+      "bid_button": "bg-[#FF5E1F] hover:bg-[#E0480C] text-white font-bold shadow-lg shadow-orange-950/40",
+      "status_live": "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 animate-pulse",
+      "status_ended": "bg-slate-800/80 text-slate-400 border border-slate-700/50",
+      "input_focus": "focus:border-[#FF5E1F] focus:ring-2 focus:ring-[#FF5E1F]/30"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-[#0B132B]/80 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.37)]",
+    "tracing_beam": "relative overflow-hidden rounded-2xl border border-white/10 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-[#FF5E1F]/20 before:to-transparent before:-translate-x-full hover:before:animate-[shimmer_2s_infinite]",
+    "noise_overlay": "opacity-20 pointer-events-none mix-blend-overlay bg-[url('https://transparenttextures.com/patterns/stardust.png')]",
+    "grid_borders": "divide-y divide-white/10 border border-white/10"
+  },
+  "layout_and_bento_grids": {
+    "hero_layout": "Asymmetric editorial split: Left (60%) featuring high-octane featured lot with real-time live ticker countdown, Right (40%) showcasing live auction feed stream & quick place-bid widget.",
+    "bento_grid_mode": "Tetris Mode (Asymmetrical Luxury Showcase)",
+    "catalog_grid": "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8",
+    "lot_detail_layout": "Top section: High-resolution gallery with thumbnail slider & sticky auction action bar; Bottom split: Left 65% (Technical specs sheet, condition inspection report PDF preview, vehicle history log), Right 35% (Bidder room widget, automated increment calculator, bid activity history table, watchlist button)."
+  },
+  "key_features_and_flows": {
+    "1_catalog_and_filtering": "Search by make/model, filter by Lot Category (Supercar, Classic/Vintage, Luxury SUV, Muscle Car, EV/Hypercar), status (Live Now, Upcoming, Ended), price range, and location in Indonesia (Jakarta, Surabaya, Bali, Bandung).",
+    "2_lot_detail_view": "Rich gallery with zoom, inspection score badge (e.g. 98/100 Grade A), comprehensive specs (Engine, Mileage, Transmission, VIN, BPKB/STNK status), seller verified badge.",
+    "3_live_bidding_simulation": "Real-time interactive bidding simulator! Instant bid increments (+Rp 5.000.000, +Rp 10.000.000, +Rp 25.000.000 or custom input). Auto-updating highest bidder badge, persistent bid log saved in local database/state, sound/toast alerts on outbid.",
+    "4_countdown_timer": "Dynamic precision clock (Hours, Minutes, Seconds) with amber accent state when < 15 mins remaining.",
+    "5_user_dashboard_and_bids_history": "Tabbed view for 'Bids Saya' (Active Bids, Winning Lots, Outbid Alerts), 'Watchlist', and 'Simulasi Saldo Deposit/Bidding Limit'.",
+    "6_auth_modal": "Simple, seamless bidder persona switch (e.g., 'Budi Santoso - Verified Bidder VIP' vs 'Siti Rahma - Collector Grade'). No real payment required as requested."
+  },
+  "image_urls": {
+    "hero_banner": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "featured_supercars": [
+      {
+        "id": "lot-001",
+        "title": "2022 Porsche 911 GT3 RS Touring Package",
+        "category": "Supercar",
+        "current_bid": 4850000000,
+        "image_url": "https://images.unsplash.com/photo-1785422850431-330836f00286?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "specs": {
+          "year": 2022,
+          "mileage": "2,400 KM",
+          "transmission": "PDK 7-Speed",
+          "engine": "4.0L Atmospheric Flat-6 (525 HP)",
+          "location": "Jakarta Selatan",
+          "grade": "Grade A+ (99/100)"
+        }
+      },
+      {
+        "id": "lot-002",
+        "title": "1964 Chevrolet Impala SS Convertible Black Edition",
+        "category": "Classic / Vintage",
+        "current_bid": 1250000000,
+        "image_url": "https://images.unsplash.com/photo-1587750059638-e7e8c43b99fc?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "specs": {
+          "year": 1964,
+          "mileage": "45,000 Miles",
+          "transmission": "Manual 4-Speed",
+          "engine": "5.4L V8 Turbo-Thrift",
+          "location": "Bandung",
+          "grade": "Collector Restoration (96/100)"
+        }
+      },
+      {
+        "id": "lot-003",
+        "title": "2023 Audi R8 V10 Performance Coupe",
+        "category": "Supercar",
+        "current_bid": 3600000000,
+        "image_url": "https://images.unsplash.com/photo-1567808291548-fc3ee04dbcf0?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "specs": {
+          "year": 2023,
+          "mileage": "1,200 KM",
+          "transmission": "S Tronic Dual-Clutch",
+          "engine": "5.2L FSI V10 (620 HP)",
+          "location": "Surabaya",
+          "grade": "Grade A (98/100)"
+        }
+      },
+      {
+        "id": "lot-004",
+        "title": "1971 Mercedes-Benz 280SL Pagoda W113",
+        "category": "Classic / Vintage",
+        "current_bid": 2100000000,
+        "image_url": "https://images.unsplash.com/photo-1523828446771-151afb8374f1?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "specs": {
+          "year": 1971,
+          "mileage": "32,000 KM",
+          "transmission": "Automatic 4-Speed",
+          "engine": "2.8L Inline-6 M130",
+          "location": "Jakarta Barat",
+          "grade": "Matching Numbers (97/100)"
+        }
+      },
+      {
+        "id": "lot-005",
+        "title": "2021 Dodge Challenger SRT Hellcat Widebody",
+        "category": "Muscle Car",
+        "current_bid": 2450000000,
+        "image_url": "https://images.unsplash.com/photo-1587750113469-d2ba02441e8f?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "specs": {
+          "year": 2021,
+          "mileage": "5,800 KM",
+          "transmission": "TorqueFlite 8-Speed Auto",
+          "engine": "6.2L Supercharged HEMI V8 (717 HP)",
+          "location": "BSD Tangerang",
+          "grade": "Grade A (95/100)"
+        }
+      },
+      {
+        "id": "lot-006",
+        "title": "2024 Koenigsegg Hypercar Studio Concept",
+        "category": "Hypercar",
+        "current_bid": 18500000000,
+        "image_url": "https://images.unsplash.com/photo-1780901833117-86ade3ac08fc?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "specs": {
+          "year": 2024,
+          "mileage": "150 KM",
+          "transmission": "9-Speed LST",
+          "engine": "5.0L Twin-Turbo V8 + E-Motor (1600 HP)",
+          "location": "Jakarta Selatan (Private Vault)",
+          "grade": "Showroom New (100/100)"
+        }
+      }
+    ]
+  },
+  "motion_and_animations": {
+    "framework": "Framer Motion",
+    "presets": {
+      "card_hover": "whileHover={{ y: -6, transition: { duration: 0.2, ease: 'easeOut' } }}",
+      "live_bid_flash": "animate={{ scale: [1, 1.05, 1], backgroundColor: ['rgba(255,94,31,0.3)', 'transparent'] }} transition={{ duration: 0.6 }}",
+      "modal_backdrop": "initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}",
+      "stagger_list": "variants={{ show: { transition: { staggerChildren: 0.08 } } }}"
+    }
+  },
+  "accessibility_and_testing": {
+    "data_testid_convention": "All actionable buttons, inputs, filter dropdowns, bid action buttons, countdown timers, and bid history items MUST feature explicit data-testid attributes (kebab-case).",
+    "test_id_examples": [
+      "data-testid='navbar-brand-logo'",
+      "data-testid='catalog-search-input'",
+      "data-testid='filter-category-select'",
+      "data-testid='lot-card-lot-001'",
+      "data-testid='place-bid-button-lot-001'",
+      "data-testid='quick-bid-increment-5m'",
+      "data-testid='bid-amount-input'",
+      "data-testid='bid-history-list'",
+      "data-testid='user-profile-toggle'",
+      "data-testid='watchlist-button-lot-001'"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "1. Read this entire design_guidelines.json before building any component.",
+    "2. Implement the dark premium automotive theme (#0B132B midnight navy background, #FF5E1F kinetic orange CTA buttons, JetBrains Mono font for numbers and timers).",
+    "3. Build key components: Navbar with user bidder selector, Hero Section with live timer & main lot, Catalog Grid with Filters & Sorts, Vehicle Detail Modal/Page with inspection specs & bid simulator, Bid History Drawer/Tab, and Toast Notifications via Sonner.",
+    "4. Store bid history in state/localStorage or API so bidder user actions persist during session testing.",
+    "5. Ensure all interactive elements include proper data-testid attributes.",
+    "6. Do NOT call third-party payment gateways; use instant simulated bid response with celebratory sound effect / animated toast feedback."
+  ]
+}
