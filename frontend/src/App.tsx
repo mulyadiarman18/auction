@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "@/pages/Home";
-import LotDetail from "@/pages/LotDetail";
-import Dashboard from "@/pages/Dashboard";
+import MarketplaceHome from "@/pages/MarketplaceHome";
+import MarketplaceLotDetail from "@/pages/MarketplaceLotDetail";
+import MarketplaceDashboard from "@/pages/MarketplaceDashboard";
 import type { Bidder } from "@/types/auction";
 
 // One <Route> per page in src/pages; BrowserRouter already wraps this in main.tsx.
@@ -17,9 +17,9 @@ export default function App() {
   };
   return (
     <Routes>
-      <Route path="/" element={<Home bidder={bidder} onBidderChange={handleBidderChange} />} />
-      <Route path="/lots/:lotId" element={<LotDetail bidder={bidder} onBidderChange={handleBidderChange} />} />
-      <Route path="/dashboard" element={<Dashboard bidder={bidder} onBidderChange={handleBidderChange} />} />
+      <Route path="/" element={<MarketplaceHome bidder={bidder} onBidderChange={handleBidderChange} />} />
+      <Route path="/lots/:lotId" element={<MarketplaceLotDetail bidder={bidder} onBidderChange={handleBidderChange} />} />
+      <Route path="/dashboard" element={<MarketplaceDashboard bidder={bidder} onBidderChange={handleBidderChange} />} />
     </Routes>
   );
 }

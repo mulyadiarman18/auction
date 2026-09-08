@@ -1,7 +1,7 @@
 # LelangOto MVP Spec
 
 ## Product
-Responsive online vehicle auction catalog for visitors and bidder participants. The MVP focuses on browsing lots, viewing lot detail, and placing simulated bids persisted in MongoDB.
+Responsive online vehicle auction marketplace for visitors and bidder participants. The MVP focuses on browsing lots, viewing lot detail, and placing simulated bids persisted in MongoDB. The active UI uses a familiar light marketplace layout with white surfaces and green primary actions.
 
 ## Data model
 - `lots`: vehicle metadata, auction status/times, pricing, increment, inspection, image, and location.

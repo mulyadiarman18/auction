@@ -132,7 +132,8 @@
     }
   body {
     min-width: 320px;
-    background: #060A17;
+    background: #f6f7f9;
+    color: #1f2937;
   }
 }
 
@@ -147,3 +148,5 @@
 }
 
 .animate-fade-up { animation: fade-up 0.45s ease-out both; }
+
+::selection { background: #c8f8c9; color: #166534; }
