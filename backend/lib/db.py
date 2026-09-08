@@ -31,6 +31,7 @@ INDEXES: dict[str, list[IndexModel]] = {
     ],
     "buyers": [IndexModel([("email", ASCENDING)], name="buyer_email", unique=True)],
     "wishlists": [IndexModel([("bidder_name", ASCENDING), ("lot_id", ASCENDING)], name="wishlist_owner_lot", unique=True)],
+    "admin_audit_logs": [IndexModel([("created_at", DESCENDING)], name="audit_created_desc")],
 }
 
 

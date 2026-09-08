@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Literal
 import uuid
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from models.auction import LotStatus
 
@@ -28,12 +28,55 @@ class BuyerProfile(BaseModel):
     company_name: str | None = None
     tax_number: str = ""
     address: str
-    verification_status: Literal["PENDING", "UNDER_REVIEW", "APPROVED", "REJECTED"] = "PENDING"
+    verification_status: Literal["INCOMPLETE", "PENDING", "UNDER_REVIEW", "APPROVED", "REJECTED"] = "INCOMPLETE"
+    screening_status: Literal["INCOMPLETE", "READY"] = "INCOMPLETE"
+    screening_issues: list[str] = Field(default_factory=list)
+    documents: list["BuyerDocument"] = Field(default_factory=list)
     created_at: datetime
+    reviewed_at: datetime | None = None
+    reviewed_by: str | None = None
+    review_reason: str | None = None
 
 
 class BuyerVerificationUpdate(BaseModel):
     verification_status: Literal["APPROVED", "REJECTED"]
+    admin_name: str = Field(min_length=2, max_length=80)
+    reason: str = Field(default="", max_length=300)
+
+    @model_validator(mode="after")
+    def require_rejection_reason(self):
+        if self.verification_status == "REJECTED" and len(self.reason.strip()) < 5:
+            raise ValueError("Alasan penolakan minimal 5 karakter")
+        return self
+
+
+class BuyerDocument(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    document_type: Literal["identity_document", "company_document"]
+    file_name: str
+    content_type: str
+    size_bytes: int
+    storage_id: str
+    uploaded_at: datetime
+
+
+class BuyerStatusResponse(BaseModel):
+    found: bool
+    profile: BuyerProfile | None = None
+
+
+class AdminAuditLog(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    entity_type: Literal["BUYER"] = "BUYER"
+    entity_id: str
+    entity_name: str
+    action: Literal["APPROVE", "REJECT"]
+    admin_name: str
+    admin_role: Literal["super_admin", "reviewer"]
+    old_status: str
+    new_status: str
+    reason: str
+    created_at: datetime
 
 
 class WishlistToggleRequest(BaseModel):

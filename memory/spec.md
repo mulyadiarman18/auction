@@ -25,3 +25,7 @@ Six demo lots are written by `backend/seed.py`: live Porsche 911 GT3 RS and Audi
 - `/register` collects individual/company bidder data and displays a `PENDING` verification state after submission. This is a demo flow without document upload or external auth.
 - `/admin` is an intentionally open demo console for lot status/schedule changes, summary metrics, and computed winner/unsold outcomes.
 - `/admin/approvals` lists `PENDING` bidder registrations and lets the demo admin persist `APPROVED` or `REJECTED` status decisions.
+- Registration now requires identity details plus a real PDF/JPG/PNG upload (and a company document for company accounts). Files are stored in Mongo GridFS; auto screening keeps incomplete submissions out of the review queue.
+- Demo admin roles are `super_admin` (inventory, schedule, outcomes, approvals) and `reviewer` (approvals only). Backend routes enforce the selected role, though authentication itself remains mocked.
+- Rejections require a reason. Every approval decision stores reviewer identity, timestamp, previous/new status, and reason in `admin_audit_logs`.
+- Bidder dashboard resolves the selected persona's latest registration and shows an `INCOMPLETE`, `PENDING`, `APPROVED`, or `REJECTED` status alert.

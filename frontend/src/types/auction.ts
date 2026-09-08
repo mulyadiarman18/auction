@@ -61,7 +61,18 @@ export interface WishlistToggleResponse {
 }
 
 export type BuyerType = "individual" | "company";
-export type VerificationStatus = "PENDING" | "UNDER_REVIEW" | "APPROVED" | "REJECTED";
+export type VerificationStatus = "INCOMPLETE" | "PENDING" | "UNDER_REVIEW" | "APPROVED" | "REJECTED";
+export type AdminRole = "super_admin" | "reviewer";
+
+export interface BuyerDocument {
+  id: string;
+  document_type: "identity_document" | "company_document";
+  file_name: string;
+  content_type: string;
+  size_bytes: number;
+  storage_id: string;
+  uploaded_at: string;
+}
 
 export interface BuyerRegistrationCreate {
   buyer_type: BuyerType;
@@ -77,11 +88,38 @@ export interface BuyerRegistrationCreate {
 export interface BuyerProfile extends BuyerRegistrationCreate {
   id: string;
   verification_status: VerificationStatus;
+  screening_status: "INCOMPLETE" | "READY";
+  screening_issues: string[];
+  documents: BuyerDocument[];
   created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  review_reason: string | null;
 }
 
 export interface BuyerVerificationUpdate {
   verification_status: "APPROVED" | "REJECTED";
+  admin_name: string;
+  reason: string;
+}
+
+export interface BuyerStatusResponse {
+  found: boolean;
+  profile: BuyerProfile | null;
+}
+
+export interface AdminAuditLog {
+  id: string;
+  entity_type: "BUYER";
+  entity_id: string;
+  entity_name: string;
+  action: "APPROVE" | "REJECT";
+  admin_name: string;
+  admin_role: AdminRole;
+  old_status: string;
+  new_status: string;
+  reason: string;
+  created_at: string;
 }
 
 export interface AdminSummary {

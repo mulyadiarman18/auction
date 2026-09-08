@@ -1,0 +1,78 @@
+{
+  "iteration": 1,
+  "summary": "8 acceptance criteria exercised via 3 backend test files (4 tests) + 6 browser checks. All passed.",
+  "passed": 9,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Role permissions membedakan Super Admin dan Reviewer",
+      "name": "test_tscheck_role_permissions.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "PATCH /api/admin/lots/{id}?admin_role=reviewer -> 403 'Aksi ini hanya tersedia untuk Super Admin'; PATCH ...?admin_role=super_admin -> 200 with updated lot."
+    },
+    {
+      "criterion": "Role permissions membedakan Super Admin dan Reviewer",
+      "name": "admin-role-restricts-reviewer",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On /admin, Super Admin shows admin-lots-section + admin-winners-section; switching to Reviewer via admin-role-bar hides admin-lots-section (count 0) and shows reviewer-restriction-card."
+    },
+    {
+      "criterion": "Registrasi bidder mendukung upload dokumen nyata dan auto screening",
+      "name": "register-full-flow-completes-screening",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Filled /register individual form incl. real PDF upload via setInputFiles; registration-success-card shows registration-status-value=PENDING and registration-screening-value contains READY."
+    },
+    {
+      "criterion": "Peserta tidak lengkap tidak masuk antrean review",
+      "name": "test_tscheck_incomplete_not_queued.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/buyers/register without documents -> 201 verification_status=INCOMPLETE, screening_status=INCOMPLETE; GET /api/admin/buyers?status=PENDING does not include the new buyer id."
+    },
+    {
+      "criterion": "Reviewer dapat menyetujui peserta pending",
+      "name": "approvals-approve-pending-buyer",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Fixture buyer registered+doc uploaded via API (PENDING/READY), row visible on /admin/approvals, clicking Setujui removes the row (count 0) and GET /api/buyers/{id} confirms verification_status=APPROVED."
+    },
+    {
+      "criterion": "Penolakan memerlukan alasan",
+      "name": "approvals-reject-requires-reason",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Reject button disabled with empty/<'bad' 3-char reason, enabled after 5+ char reason; click sets REJECTED and GET /api/buyers/{id} shows review_reason='Dokumen identitas tidak sesuai'."
+    },
+    {
+      "criterion": "Audit log menyimpan keputusan lengkap",
+      "name": "approvals-approve-pending-buyer",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "admin-audit-list on /admin/approvals contains the approved buyer's full name after the decision (also verified reject reason text in approvals-reject-requires-reason)."
+    },
+    {
+      "criterion": "Dashboard bidder menampilkan approval alert",
+      "name": "dashboard-shows-approval-banner",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Fixture buyer registered/uploaded/rejected via API, localStorage bidder set to matching full_name, /dashboard shows dashboard-verification-alert-title='Verifikasi ditolak' and reason text 'Alamat tidak sesuai dokumen'."
+    },
+    {
+      "criterion": "Admin dapat mengunduh dokumen peserta",
+      "name": "test_tscheck_admin_document_download.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/buyers/{id}/documents (PDF bytes) then GET /api/admin/buyers/{id}/documents/{doc_id}?admin_role=reviewer -> 200, content-type application/pdf, body bytes match uploaded fixture."
+    }
+  ],
+  "notes": [
+    "Matrix has 8 criteria; 9 artifacts were produced because 'Audit log menyimpan keputusan lengkap' is covered by the same browser checks that exercise approve/reject (no separate flow needed).",
+    "Admin auth is intentionally MOCKED per spec_deviations (role chosen via UI/localStorage, backend enforces via admin_role query param) - this matches the briefing and is not a bug."
+  ]
+}

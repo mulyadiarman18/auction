@@ -11,7 +11,7 @@ interface MarketHeaderProps {
   onSearchChange?: (value: string) => void;
 }
 
-const bidderOptions: Bidder[] = [
+const defaultBidderOptions: Bidder[] = [
   { name: "Budi Santoso", type: "Verified Bidder VIP" },
   { name: "Siti Rahma", type: "Collector Grade" },
 ];
@@ -20,6 +20,7 @@ export function AuctionHeader({ bidder, onBidderChange, search = "", onSearchCha
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
   const isAdmin = location.pathname.startsWith("/admin");
+  const bidderOptions = defaultBidderOptions.some((option) => option.name === bidder.name) ? defaultBidderOptions : [bidder, ...defaultBidderOptions];
 
   return (
     <header data-testid="auction-header" className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)]">

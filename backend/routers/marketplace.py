@@ -1,12 +1,16 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, HTTPException, Query
+from bson import ObjectId
+from fastapi import APIRouter, File, Form, HTTPException, Query, Response, UploadFile
+from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 from pymongo import DESCENDING
 
 from lib.db import db
 from models.marketplace import (
     BuyerProfile,
     BuyerRegistrationCreate,
+    BuyerDocument,
+    BuyerStatusResponse,
     WishlistItem,
     WishlistToggleRequest,
     WishlistToggleResponse,
@@ -15,6 +19,22 @@ from models.marketplace import (
 
 buyers_router = APIRouter(prefix="/buyers", tags=["buyers"])
 wishlist_router = APIRouter(prefix="/wishlists", tags=["wishlists"])
+documents_bucket = AsyncIOMotorGridFSBucket(db, bucket_name="buyer_documents")
+ALLOWED_DOCUMENT_TYPES = {"application/pdf", "image/jpeg", "image/png"}
+MAX_DOCUMENT_SIZE = 5 * 1024 * 1024
+
+
+def screen_buyer(document: dict) -> tuple[str, list[str]]:
+    issues: list[str] = []
+    for field, label in (("full_name", "Nama lengkap"), ("email", "Email"), ("phone", "Nomor HP"), ("identity_number", "Nomor identitas"), ("address", "Alamat")):
+        if not str(document.get(field, "")).strip():
+            issues.append(f"{label} belum lengkap")
+    document_types = {item.get("document_type") for item in document.get("documents", [])}
+    if "identity_document" not in document_types:
+        issues.append("Dokumen identitas belum diunggah")
+    if document.get("buyer_type") == "company" and "company_document" not in document_types:
+        issues.append("Dokumen perusahaan belum diunggah")
+    return ("READY" if not issues else "INCOMPLETE", issues)
 
 
 @buyers_router.post("/register", response_model=BuyerProfile, status_code=201)
@@ -23,9 +43,59 @@ async def register_buyer(input: BuyerRegistrationCreate):
     existing = await db.buyers.find_one({"email": email})
     if existing:
         return BuyerProfile(**existing)
-    profile = BuyerProfile(**input.model_dump(exclude={"email"}), email=email, created_at=datetime.now(timezone.utc))
+    draft = input.model_dump(exclude={"email"}) | {"email": email, "documents": []}
+    screening_status, screening_issues = screen_buyer(draft)
+    profile = BuyerProfile(**draft, screening_status=screening_status, screening_issues=screening_issues, verification_status="INCOMPLETE", created_at=datetime.now(timezone.utc))
     await db.buyers.insert_one(profile.model_dump())
     return profile
+
+
+@buyers_router.get("/status/by-name", response_model=BuyerStatusResponse)
+async def get_buyer_status(full_name: str = Query(min_length=2, max_length=100)):
+    document = await db.buyers.find_one({"full_name": full_name}, sort=[("created_at", DESCENDING)])
+    return BuyerStatusResponse(found=document is not None, profile=BuyerProfile(**document) if document else None)
+
+
+@buyers_router.post("/{buyer_id}/documents", response_model=BuyerProfile)
+async def upload_buyer_document(
+    buyer_id: str,
+    document_type: str = Form(...),
+    file: UploadFile = File(...),
+):
+    buyer = await db.buyers.find_one({"id": buyer_id})
+    if not buyer:
+        raise HTTPException(status_code=404, detail="Data peserta tidak ditemukan")
+    if document_type not in {"identity_document", "company_document"}:
+        raise HTTPException(status_code=400, detail="Jenis dokumen tidak didukung")
+    content_type = file.content_type or "application/octet-stream"
+    if content_type not in ALLOWED_DOCUMENT_TYPES:
+        raise HTTPException(status_code=400, detail="Dokumen harus PDF, JPG, atau PNG")
+    contents = await file.read(MAX_DOCUMENT_SIZE + 1)
+    if len(contents) > MAX_DOCUMENT_SIZE:
+        raise HTTPException(status_code=400, detail="Ukuran dokumen maksimal 5 MB")
+    if not contents:
+        raise HTTPException(status_code=400, detail="Dokumen kosong")
+    storage_id = await documents_bucket.upload_from_stream(
+        file.filename or f"{document_type}.bin",
+        contents,
+        metadata={"buyer_id": buyer_id, "document_type": document_type, "content_type": content_type},
+    )
+    document = BuyerDocument(
+        document_type=document_type,
+        file_name=file.filename or f"{document_type}.bin",
+        content_type=content_type,
+        size_bytes=len(contents),
+        storage_id=str(storage_id),
+        uploaded_at=datetime.now(timezone.utc),
+    )
+    documents = [item for item in buyer.get("documents", []) if item.get("document_type") != document_type]
+    documents.append(document.model_dump())
+    updated = buyer | {"documents": documents}
+    screening_status, screening_issues = screen_buyer(updated)
+    verification_status = "PENDING" if screening_status == "READY" else "INCOMPLETE"
+    await db.buyers.update_one({"id": buyer_id}, {"$set": {"documents": documents, "screening_status": screening_status, "screening_issues": screening_issues, "verification_status": verification_status}})
+    updated_document = await db.buyers.find_one({"id": buyer_id})
+    return BuyerProfile(**updated_document)
 
 
 @buyers_router.get("/{buyer_id}", response_model=BuyerProfile)
