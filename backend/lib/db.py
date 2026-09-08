@@ -23,11 +23,14 @@ INDEXES: dict[str, list[IndexModel]] = {
         IndexModel([("id", ASCENDING)], name="lot_id", unique=True),
         IndexModel([("status", ASCENDING), ("auction_end", ASCENDING)], name="lot_status_end"),
         IndexModel([("category", ASCENDING)], name="lot_category"),
+        IndexModel([("location", ASCENDING), ("current_bid", ASCENDING)], name="lot_location_price"),
     ],
     "bids": [
         IndexModel([("lot_id", ASCENDING), ("created_at", DESCENDING)], name="bid_lot_created"),
         IndexModel([("bidder_name", ASCENDING), ("created_at", DESCENDING)], name="bidder_created"),
     ],
+    "buyers": [IndexModel([("email", ASCENDING)], name="buyer_email", unique=True)],
+    "wishlists": [IndexModel([("bidder_name", ASCENDING), ("lot_id", ASCENDING)], name="wishlist_owner_lot", unique=True)],
 }
 
 

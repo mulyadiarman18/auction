@@ -21,6 +21,10 @@ async def list_lots(
     category: str | None = Query(default=None),
     status: str | None = Query(default=None),
     search: str | None = Query(default=None),
+    min_price: int | None = Query(default=None, ge=0),
+    max_price: int | None = Query(default=None, ge=0),
+    location: str | None = Query(default=None),
+    sort: str = Query(default="ending_soon"),
 ):
     query: dict = {}
     if category and category != "all":
@@ -34,7 +38,17 @@ async def list_lots(
             {"lot_number": {"$regex": escaped, "$options": "i"}},
             {"location": {"$regex": escaped, "$options": "i"}},
         ]
-    documents = await db.lots.find(query).sort("auction_end", ASCENDING).to_list(100)
+    if min_price is not None or max_price is not None:
+        query["current_bid"] = {}
+        if min_price is not None:
+            query["current_bid"]["$gte"] = min_price
+        if max_price is not None:
+            query["current_bid"]["$lte"] = max_price
+    if location and location != "all":
+        query["location"] = {"$regex": re.escape(location), "$options": "i"}
+    sort_field = "auction_end" if sort not in {"price_asc", "price_desc"} else "current_bid"
+    sort_direction = ASCENDING if sort != "price_desc" else DESCENDING
+    documents = await db.lots.find(query).sort(sort_field, sort_direction).to_list(100)
     return [_lot_from_doc(document) for document in documents]
 
 

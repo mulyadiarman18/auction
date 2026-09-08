@@ -1,0 +1,50 @@
+from fastapi import APIRouter, HTTPException
+from pymongo import ASCENDING, DESCENDING
+
+from lib.db import db
+from models.auction import Lot
+from models.marketplace import AdminLotUpdate, AdminSummary, AdminWinner
+
+
+router = APIRouter(prefix="/admin", tags=["admin"])
+
+
+@router.get("/summary", response_model=AdminSummary)
+async def admin_summary():
+    total_lots = await db.lots.count_documents({})
+    live_lots = await db.lots.count_documents({"status": "LIVE"})
+    upcoming_lots = await db.lots.count_documents({"status": "UPCOMING"})
+    ended_lots = await db.lots.count_documents({"status": "ENDED"})
+    bids = await db.bids.find({}, {"amount": 1}).to_list(10000)
+    pending_buyers = await db.buyers.count_documents({"verification_status": "PENDING"})
+    return AdminSummary(total_lots=total_lots, live_lots=live_lots, upcoming_lots=upcoming_lots, ended_lots=ended_lots, total_bids=len(bids), total_bid_value=sum(int(bid.get("amount", 0)) for bid in bids), pending_buyers=pending_buyers)
+
+
+@router.get("/lots", response_model=list[Lot])
+async def admin_lots():
+    documents = await db.lots.find().sort([("status", ASCENDING), ("auction_end", ASCENDING)]).to_list(100)
+    return [Lot(**document) for document in documents]
+
+
+@router.patch("/lots/{lot_id}", response_model=Lot)
+async def update_admin_lot(lot_id: str, input: AdminLotUpdate):
+    values = input.model_dump(exclude_none=True)
+    if not values:
+        raise HTTPException(status_code=400, detail="Tidak ada perubahan untuk disimpan")
+    document = await db.lots.find_one_and_update({"id": lot_id}, {"$set": values}, return_document=True)
+    if not document:
+        raise HTTPException(status_code=404, detail="Lot tidak ditemukan")
+    return Lot(**document)
+
+
+@router.get("/winners", response_model=list[AdminWinner])
+async def admin_winners():
+    lots = await db.lots.find().sort("auction_end", DESCENDING).to_list(100)
+    winners: list[AdminWinner] = []
+    for lot in lots:
+        highest_bid = await db.bids.find_one({"lot_id": lot["id"]}, sort=[("amount", DESCENDING)])
+        winner_status = "PENDING"
+        if lot["status"] == "ENDED":
+            winner_status = "WON" if highest_bid else "UNSOLD"
+        winners.append(AdminWinner(lot_id=lot["id"], lot_number=lot["lot_number"], title=lot["title"], status=winner_status, bidder_name=highest_bid.get("bidder_name") if highest_bid and winner_status == "WON" else None, winning_bid=highest_bid.get("amount") if highest_bid and winner_status == "WON" else None, auction_end=lot["auction_end"]))
+    return winners

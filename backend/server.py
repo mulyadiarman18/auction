@@ -14,6 +14,8 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 from lib.db import client, db, ensure_indexes
 from routers.auction import bids_router, router as auction_router
+from routers.admin import router as admin_router
+from routers.marketplace import buyers_router, wishlist_router
 
 
 # Startup runs before the yield, shutdown after it. Add your own setup/teardown here.
@@ -38,6 +40,9 @@ async def root():
 
 api_router.include_router(auction_router)
 api_router.include_router(bids_router)
+api_router.include_router(buyers_router)
+api_router.include_router(wishlist_router)
+api_router.include_router(admin_router)
 
 app.add_middleware(
     CORSMiddleware,

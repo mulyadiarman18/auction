@@ -18,3 +18,9 @@ The MVP has visitor and bidder personas only. Authentication is intentionally mo
 
 ## Seed data
 Six demo lots are written by `backend/seed.py`: live Porsche 911 GT3 RS and Audi R8, upcoming Impala, Mercedes 280SL, Koenigsegg, and an ended Dodge Challenger.
+
+## Added marketplace features
+- Catalog filters support minimum/maximum current bid (in millions), location, category, status, and ending/price sort options.
+- Wishlist items are persisted in MongoDB per demo bidder persona via `/api/wishlists`; toggling a lot shows a local toast reminder.
+- `/register` collects individual/company bidder data and displays a `PENDING` verification state after submission. This is a demo flow without document upload or external auth.
+- `/admin` is an intentionally open demo console for lot status/schedule changes, summary metrics, and computed winner/unsold outcomes.
