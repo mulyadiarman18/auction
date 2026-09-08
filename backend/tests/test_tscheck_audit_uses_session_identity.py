@@ -29,7 +29,7 @@ def test_audit_log_uses_session_identity_not_client_body(client, login_as):
     assert uploaded.status_code == 200, uploaded.text
     assert uploaded.json()["screening_status"] == "READY"
 
-    rv_session = login_as(client, "reviewer", "ReviewOto!2026")
+    rv_session = login_as(client, "reviewer", "MITReview!2026")
     rv_headers = {"Cookie": rv_session["cookie_header"]}
     session_name = rv_session["user"]["name"]
     session_role = rv_session["user"]["role"]

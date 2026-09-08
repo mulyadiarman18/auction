@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import MarketplaceHome from "@/pages/MarketplaceHomeV2";
-import MarketplaceLotDetail from "@/pages/MarketplaceLotDetail";
+import MarketplaceHome from "@/pages/MiningHome";
+import MarketplaceLotDetail from "@/pages/MiningLotDetail";
 import MarketplaceDashboard from "@/pages/MarketplaceDashboardSecure";
 import MarketplaceRegister from "@/pages/MarketplaceRegisterV2";
 import MarketplaceAdmin from "@/pages/MarketplaceAdminV2";
 import MarketplaceAdminApprovals from "@/pages/MarketplaceAdminApprovalsV3";
 import MarketplaceResubmit from "@/pages/MarketplaceResubmit";
-import AdminLogin from "@/pages/AdminLogin";
+import AdminLogin from "@/pages/MITAdminLogin";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import type { Bidder } from "@/types/auction";
 

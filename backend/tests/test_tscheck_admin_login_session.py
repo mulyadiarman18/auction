@@ -11,7 +11,7 @@ def test_unauthenticated_request_is_rejected(client):
 
 
 def test_valid_login_creates_session_and_grants_access(client, login_as):
-    session = login_as(client, "superadmin", "LelangOto!2026")
+    session = login_as(client, "superadmin", "MITAuction!2026")
     assert session["user"]["role"] == "super_admin"
     headers = {"Cookie": session["cookie_header"]}
 

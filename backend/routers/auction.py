@@ -37,6 +37,10 @@ async def list_lots(
             {"title": {"$regex": escaped, "$options": "i"}},
             {"lot_number": {"$regex": escaped, "$options": "i"}},
             {"location": {"$regex": escaped, "$options": "i"}},
+            {"unit_number": {"$regex": escaped, "$options": "i"}},
+            {"hull_number": {"$regex": escaped, "$options": "i"}},
+            {"registration_code": {"$regex": escaped, "$options": "i"}},
+            {"brand": {"$regex": escaped, "$options": "i"}},
         ]
     if min_price is not None or max_price is not None:
         query["current_bid"] = {}

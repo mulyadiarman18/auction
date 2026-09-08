@@ -52,24 +52,24 @@
 }
 
 :root {
-    --background: oklch(0.13 0.035 264);
-    --foreground: oklch(0.98 0.01 95);
-    --card: oklch(0.19 0.04 264);
-    --card-foreground: oklch(0.98 0.01 95);
-    --popover: oklch(0.19 0.04 264);
-    --popover-foreground: oklch(0.98 0.01 95);
-    --primary: oklch(0.72 0.19 42);
-    --primary-foreground: oklch(0.98 0.01 95);
-    --secondary: oklch(0.25 0.05 264);
-    --secondary-foreground: oklch(0.98 0.01 95);
-    --muted: oklch(0.25 0.05 264);
-    --muted-foreground: oklch(0.68 0.035 260);
-    --accent: oklch(0.25 0.05 264);
-    --accent-foreground: oklch(0.98 0.01 95);
+    --background: oklch(0.97 0.005 90);
+    --foreground: oklch(0.24 0.01 80);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.24 0.01 80);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.24 0.01 80);
+    --primary: oklch(0.81 0.17 83);
+    --primary-foreground: oklch(0.24 0.01 80);
+    --secondary: oklch(0.94 0.01 85);
+    --secondary-foreground: oklch(0.24 0.01 80);
+    --muted: oklch(0.94 0.01 85);
+    --muted-foreground: oklch(0.52 0.02 80);
+    --accent: oklch(0.92 0.08 88);
+    --accent-foreground: oklch(0.24 0.01 80);
     --destructive: oklch(0.65 0.22 25);
-    --border: oklch(1 0 0 / 12%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.72 0.19 42);
+    --border: oklch(0.88 0.01 85);
+    --input: oklch(0.88 0.01 85);
+    --ring: oklch(0.81 0.17 83);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
@@ -132,7 +132,7 @@
     }
   body {
     min-width: 320px;
-    background: #f6f7f9;
+    background: #f4f4f2;
     color: #1f2937;
   }
 }
@@ -149,4 +149,22 @@
 
 .animate-fade-up { animation: fade-up 0.45s ease-out both; }
 
-::selection { background: #c8f8c9; color: #166534; }
+::selection { background: #ffe68a; color: #202124; }
+
+/* MIT Auction industrial palette overrides for legacy workflow surfaces. */
+.bg-\[\#03AC0E\] { background-color: #f5b800 !important; }
+.hover\:bg-\[\#02930c\]:hover { background-color: #d89e00 !important; }
+.bg-\[\#E8F9EA\] { background-color: #fff4c2 !important; }
+.text-\[\#03AC0E\] { color: #9a6700 !important; }
+.text-\[\#C8F8C9\] { color: #5a4300 !important; }
+.text-\[\#8DE68F\] { color: #f5b800 !important; }
+.border-\[\#03AC0E\] { border-color: #f5b800 !important; }
+.hover\:text-\[\#03AC0E\]:hover { color: #8a5b00 !important; }
+.hover\:border-\[\#03AC0E\]:hover { border-color: #f5b800 !important; }
+.focus\:border-\[\#03AC0E\]:focus { border-color: #f5b800 !important; }
+[data-testid="registration-info"], [data-testid="dashboard-heading-block"] { color: #202124 !important; }
+[data-testid="registration-description"], [data-testid="dashboard-description"], [data-testid="dashboard-eyebrow"], [data-testid^="registration-benefit-"] { color: rgba(32, 33, 36, 0.72) !important; }
+[data-testid="registration-submit-button"], [data-testid="resubmission-submit"], [data-testid="admin-login-submit"] { color: #202124 !important; }
+[data-testid="dashboard-browse-link"], [data-testid="dashboard-resubmission-link"], [data-testid^="place-bid-button-"], [data-testid^="admin-approve-button-"] { color: #202124 !important; }
+[data-testid="catalog-eyebrow"] { font-size: 0 !important; }
+[data-testid="catalog-eyebrow"]::after { content: "Katalog disposal MIT"; font-size: 0.75rem; }

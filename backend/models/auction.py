@@ -33,6 +33,16 @@ class Lot(BaseModel):
     features: list[str] = Field(default_factory=list)
     vin: str
     document_status: str
+    auction_code: str = "LLG-20260910-01"
+    unit_number: str = ""
+    hull_number: str = ""
+    registration_code: str = ""
+    brand: str = ""
+    model_type: str = ""
+    operating_hours: str = ""
+    seller_name: str = "MPI Verified Vendor"
+    pool_location: str = ""
+    document_completeness: list[str] = Field(default_factory=list)
 
 
 class BidCreate(BaseModel):

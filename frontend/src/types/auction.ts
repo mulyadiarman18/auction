@@ -25,6 +25,16 @@ export interface Lot {
   features: string[];
   vin: string;
   document_status: string;
+  auction_code: string;
+  unit_number: string;
+  hull_number: string;
+  registration_code: string;
+  brand: string;
+  model_type: string;
+  operating_hours: string;
+  seller_name: string;
+  pool_location: string;
+  document_completeness: string[];
 }
 
 export interface Bid {

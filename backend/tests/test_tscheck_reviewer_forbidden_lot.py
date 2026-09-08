@@ -5,7 +5,7 @@ while a Super Admin session on the same lot succeeds.
 """
 
 def test_reviewer_forbidden_from_lot_mutation_but_superadmin_allowed(client, login_as):
-    sa_session = login_as(client, "superadmin", "LelangOto!2026")
+    sa_session = login_as(client, "superadmin", "MITAuction!2026")
     sa_headers = {"Cookie": sa_session["cookie_header"]}
     lots = client.get("/admin/lots", headers=sa_headers)
     assert lots.status_code == 200, lots.text
@@ -13,7 +13,7 @@ def test_reviewer_forbidden_from_lot_mutation_but_superadmin_allowed(client, log
     lot_id = lot["id"]
     original_status = lot["status"]
 
-    rv_session = login_as(client, "reviewer", "ReviewOto!2026")
+    rv_session = login_as(client, "reviewer", "MITReview!2026")
     rv_headers = {"Cookie": rv_session["cookie_header"]}
 
     forbidden = client.patch(f"/admin/lots/{lot_id}", json={"status": original_status}, headers=rv_headers)

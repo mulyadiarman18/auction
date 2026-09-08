@@ -30,7 +30,7 @@ def test_registration_without_documents_is_incomplete(client, unique_email, logi
     assert body["screening_status"] == "INCOMPLETE"
     assert "identity_document" not in {d.get("document_type") for d in body["documents"]}
 
-    session = login_as(client, "superadmin", "LelangOto!2026")
+    session = login_as(client, "superadmin", "MITAuction!2026")
     pending = client.get("/admin/buyers", params={"status": "PENDING"}, headers={"Cookie": session["cookie_header"]})
     assert pending.status_code == 200
     pending_ids = {b["id"] for b in pending.json()}

@@ -1,0 +1,105 @@
+{
+  "iteration": 3,
+  "summary": "MIT Auction rebranding to mining-equipment marketplace: 8/8 acceptance criteria exercised via 8 new browser checks (all passed) + 1 new backend test file (2 tests, passed) covering the API-backed bidding criterion. Also repaired 4 pre-existing backend test files that were still using pre-rebrand credentials (LelangOto!2026 / ReviewOto!2026) so the full backend suite (8 tests) is green again.",
+  "passed": 13,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [
+    "note: MiningHome.tsx catalog eyebrow text still reads 'Katalog disposal MPI' (leftover MPI naming vs the chosen 'MIT Auction' product brand). Not flagged as a bug because spec_deviations explicitly allows the PRD working name 'MPI Auction' to coexist informally, and it does not violate the 'no LelangOto branding' requirement checked in brand-shows-mit-auction — but worth a follow-up copy pass if full consistency is desired.",
+    "note: MarketBidPanel/AuctionHeader retain the old green (#03AC0E) accent color for bid CTA/badges on the lot detail sidebar, while hero/header/footer/admin use the new yellow-charcoal industrial theme. Acceptance criterion only requires green not be the main/primary color (satisfied — hero, header, CTAs are yellow/charcoal), so this is classified as an improvement opportunity, not a bug."
+  ],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Brand aplikasi berubah menjadi MIT Auction",
+      "name": "brand-shows-mit-auction",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Homepage title matches /MIT Auction/, footer brand shows 'MIT'+'Auction', admin login brand shows 'MIT Auction'; full body text scanned for 'LelangOto'/'lelangoto' — none found."
+    },
+    {
+      "criterion": "Tema visual memakai industrial kuning-charcoal-putih",
+      "name": "theme-uses-industrial-yellow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Hero eyebrow's ancestor background resolves to rgb(245, 184, 0) (#F5B800, the industrial yellow token); home surface uses light gray/white (#f4f4f2) rather than the old green."
+    },
+    {
+      "criterion": "Seluruh katalog berisi unit tambang",
+      "name": "catalog-shows-mining-units",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "lot-catalog-grid renders exactly 6 cards containing Excavator, Dump Truck, Motor Grader, Bulldozer, Articulated (hauler), Wheel Loader; regex-checked for leftover car keywords (Sedan/Hatchback/MPV/Supercar) — none found."
+    },
+    {
+      "criterion": "Filter katalog sesuai domain tambang",
+      "name": "catalog-filter-search-works",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "filter-category-select=Excavator narrows to Komatsu PC400LC-8 only; filter-location-select=Kalimantan Timur surfaces Pool Sangatta; search 'EXC-041' (unit number) returns exactly 1 card; search 'MPI-ORI-041' (registration code) returns the same lot."
+    },
+    {
+      "criterion": "Detail lot menampilkan identitas unit disposal",
+      "name": "lot-detail-shows-unit-identity",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "/lots/lot-001 shows lot-detail-number LLG-20260910-01-L001, registration code MPI-ORI-041, and specs grid containing unit no. EXC-041, hull no. PC400-041, brand/type Komatsu PC400LC-8, jam operasi 12.480 HM, Grade B, vendor PT Karya Mineral Nusantara, pool Sangatta, inspection score 87, and document status 'Faktur & Form A tersedia'."
+    },
+    {
+      "criterion": "Bidding tetap berfungsi setelah migrasi data",
+      "name": "quick-bid-updates-highest-bid",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On LIVE lot-001, clicking quick-bid-increment-25m surfaces bid-success-confirmation, bid-current-value text changes, and recent-bid-count increments."
+    },
+    {
+      "criterion": "Bidding tetap berfungsi setelah migrasi data",
+      "name": "test_tscheck_bidding_after_migration.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/lots/lot-001/bids (LIVE, amount=current_bid+increment) -> 201 with amount/lot_id/bidder_name persisted; GET /api/lots/lot-001 afterwards shows current_bid updated to the new amount; GET /api/lots/lot-001/bids includes the new bid id. Second test: POST /api/lots/lot-002/bids (UPCOMING) -> 4xx rejection confirming non-LIVE lots reject bids."
+    },
+    {
+      "criterion": "Admin melihat inventori alat berat",
+      "name": "admin-inventory-shows-mining-units",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Login superadmin/MITAuction!2026 -> admin-page; admin-lots-count shows '6 lot'; admin-lots-list text contains all 6 mining titles (Komatsu PC400LC-8, Komatsu HD785-7, Caterpillar 16M, Komatsu D155A-6, Volvo A40G, Caterpillar 980M); admin-lot-status-lot-002 status control visible/usable."
+    },
+    {
+      "criterion": "Responsive marketplace tetap usable",
+      "name": "catalog-detail-no-overflow-desktop",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "At 1280x800, document.documentElement.scrollWidth <= clientWidth on both the catalog/home page and /lots/lot-001 detail page (no horizontal overflow); quick-bid-actions control has a positive bounding box (not obscured/zero-size)."
+    },
+    {
+      "criterion": "Admin route dilindungi login nyata (pre-existing, credential-repaired)",
+      "name": "test_tscheck_admin_login_session.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "Repaired stale credential (LelangOto!2026 -> MITAuction!2026). GET /api/admin/lots without cookie -> 401; POST /api/admin/auth/login (superadmin/MITAuction!2026) -> 200 + session cookie; GET /api/admin/auth/me -> 200 username=superadmin; wrong password -> 401 with no cookie."
+    },
+    {
+      "criterion": "Reviewer hanya dapat review peserta (pre-existing, credential-repaired)",
+      "name": "test_tscheck_reviewer_forbidden_lot.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "Repaired stale credentials for both roles (superadmin + reviewer -> MITAuction!2026 / MITReview!2026). Reviewer session rejected (403) from lot mutation; superadmin session allowed."
+    },
+    {
+      "criterion": "Audit log identitas sesi (pre-existing, credential-repaired)",
+      "name": "test_tscheck_audit_uses_session_identity.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "Repaired stale reviewer credential (ReviewOto!2026 -> MITReview!2026). Buyer registration + document upload -> READY; reviewer session identity correctly used for audit trail rather than client-supplied body."
+    },
+    {
+      "criterion": "Registrasi tanpa dokumen tetap tidak lengkap (pre-existing, credential-repaired)",
+      "name": "test_tscheck_incomplete_not_queued.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "Repaired stale superadmin credential (LelangOto!2026 -> MITAuction!2026). Registration without documents remains INCOMPLETE and is not queued for review."
+    }
+  ]
+}
