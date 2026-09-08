@@ -5,6 +5,7 @@ import MarketplaceLotDetail from "@/pages/MarketplaceLotDetail";
 import MarketplaceDashboard from "@/pages/MarketplaceDashboard";
 import MarketplaceRegister from "@/pages/MarketplaceRegister";
 import MarketplaceAdmin from "@/pages/MarketplaceAdmin";
+import MarketplaceAdminApprovals from "@/pages/MarketplaceAdminApprovals";
 import type { Bidder } from "@/types/auction";
 
 // One <Route> per page in src/pages; BrowserRouter already wraps this in main.tsx.
@@ -24,6 +25,7 @@ export default function App() {
       <Route path="/dashboard" element={<MarketplaceDashboard bidder={bidder} onBidderChange={handleBidderChange} />} />
       <Route path="/register" element={<MarketplaceRegister bidder={bidder} onBidderChange={handleBidderChange} />} />
       <Route path="/admin" element={<MarketplaceAdmin bidder={bidder} onBidderChange={handleBidderChange} />} />
+      <Route path="/admin/approvals" element={<MarketplaceAdminApprovals bidder={bidder} onBidderChange={handleBidderChange} />} />
     </Routes>
   );
 }

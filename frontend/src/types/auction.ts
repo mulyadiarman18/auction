@@ -80,6 +80,10 @@ export interface BuyerProfile extends BuyerRegistrationCreate {
   created_at: string;
 }
 
+export interface BuyerVerificationUpdate {
+  verification_status: "APPROVED" | "REJECTED";
+}
+
 export interface AdminSummary {
   total_lots: number;
   live_lots: number;

@@ -32,6 +32,10 @@ class BuyerProfile(BaseModel):
     created_at: datetime
 
 
+class BuyerVerificationUpdate(BaseModel):
+    verification_status: Literal["APPROVED", "REJECTED"]
+
+
 class WishlistToggleRequest(BaseModel):
     bidder_name: str = Field(min_length=2, max_length=80)
     lot_id: str

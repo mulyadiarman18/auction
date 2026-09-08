@@ -19,6 +19,7 @@ const bidderOptions: Bidder[] = [
 export function AuctionHeader({ bidder, onBidderChange, search = "", onSearchChange }: MarketHeaderProps) {
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
+  const isAdmin = location.pathname.startsWith("/admin");
 
   return (
     <header data-testid="auction-header" className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
@@ -48,7 +49,7 @@ export function AuctionHeader({ bidder, onBidderChange, search = "", onSearchCha
         <Link data-testid="header-dashboard-button" to="/dashboard" className={buttonVariants({ size: "sm", className: `hidden gap-1.5 bg-[#03AC0E] text-white hover:bg-[#02930c] sm:inline-flex ${isDashboard ? "ring-2 ring-[#03AC0E]/20" : ""}` })}><LayoutDashboard size={15} /> <span className="hidden lg:inline">Dashboard</span></Link>
       </div>
       <nav data-testid="marketplace-navigation" className="hidden border-t border-slate-100 sm:block">
-        <div className="mx-auto flex max-w-[1240px] items-center gap-6 px-4 py-2.5 text-xs text-slate-500 sm:px-6 lg:px-8"><Link data-testid="navigation-catalog-link" to="/#catalog" className="font-semibold text-slate-700 hover:text-[#03AC0E]">Katalog kendaraan</Link><Link data-testid="navigation-live-link" to="/?status=LIVE#catalog" className="hover:text-[#03AC0E]">Live auction</Link><Link data-testid="navigation-how-it-works-link" to="/#how-it-works" className="hover:text-[#03AC0E]">Cara ikut lelang</Link><Link data-testid="navigation-register-link" to="/register" className="hover:text-[#03AC0E]">Daftar bidder</Link><span data-testid="marketplace-shipping-note" className="ml-auto flex items-center gap-1.5 text-slate-400"><Badge data-testid="marketplace-live-badge" className="bg-[#E8F9EA] px-1.5 py-0 text-[9px] text-[#03AC0E] hover:bg-[#E8F9EA]">LIVE</Badge> Update bid tersimpan otomatis</span></div>
+        <div className="mx-auto flex max-w-[1240px] items-center gap-6 px-4 py-2.5 text-xs text-slate-500 sm:px-6 lg:px-8"><Link data-testid="navigation-catalog-link" to="/#catalog" className="font-semibold text-slate-700 hover:text-[#03AC0E]">Katalog kendaraan</Link><Link data-testid="navigation-live-link" to="/?status=LIVE#catalog" className="hover:text-[#03AC0E]">Live auction</Link><Link data-testid="navigation-how-it-works-link" to="/#how-it-works" className="hover:text-[#03AC0E]">Cara ikut lelang</Link><Link data-testid="navigation-register-link" to="/register" className="hover:text-[#03AC0E]">Daftar bidder</Link>{isAdmin && <Link data-testid="navigation-admin-approvals-link" to="/admin/approvals" className="font-semibold text-[#03AC0E]">Approval bidder</Link>}<span data-testid="marketplace-shipping-note" className="ml-auto flex items-center gap-1.5 text-slate-400"><Badge data-testid="marketplace-live-badge" className="bg-[#E8F9EA] px-1.5 py-0 text-[9px] text-[#03AC0E] hover:bg-[#E8F9EA]">LIVE</Badge> Update bid tersimpan otomatis</span></div>
       </nav>
     </header>
   );
