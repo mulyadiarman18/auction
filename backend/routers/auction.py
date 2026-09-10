@@ -1,7 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import re
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from pymongo import ASCENDING, DESCENDING, ReturnDocument
 
 from lib.db import db
@@ -69,14 +69,22 @@ async def list_lot_bids(lot_id: str):
     if not await db.lots.find_one({"id": lot_id}, {"_id": 1}):
         raise HTTPException(status_code=404, detail="Lot tidak ditemukan")
     documents = await db.bids.find({"lot_id": lot_id}).sort("created_at", DESCENDING).to_list(100)
-    return [Bid(**document) for document in documents]
+    results = []
+    for document in documents:
+        bid = Bid(**document)
+        bid.bidder_name = f"Bidder #{(bid.bidder_code or bid.id)[-4:].upper()}"
+        results.append(bid)
+    return results
 
 
 @router.post("/{lot_id}/bids", response_model=Bid, status_code=201)
-async def place_bid(lot_id: str, input: BidCreate):
+async def place_bid(lot_id: str, input: BidCreate, request: Request):
     lot = await db.lots.find_one({"id": lot_id})
     if not lot:
         raise HTTPException(status_code=404, detail="Lot tidak ditemukan")
+    buyer = await db.buyers.find_one({"full_name": input.bidder_name}, sort=[("created_at", DESCENDING)])
+    if not buyer or buyer.get("verification_status") != "APPROVED" or buyer.get("membership_status") != "ACTIVE" or buyer.get("membership_payment_status") != "CONFIRMED" or buyer.get("deposit_status") != "CONFIRMED":
+        raise HTTPException(status_code=403, detail="Bid membutuhkan bidder APPROVED, biaya member lunas, membership aktif, dan deposit CONFIRMED")
     now = datetime.now(timezone.utc)
     if lot["status"] != "LIVE" or lot["auction_end"] < now.replace(tzinfo=None):
         raise HTTPException(status_code=400, detail="Lelang untuk lot ini sudah tidak aktif")
@@ -102,8 +110,13 @@ async def place_bid(lot_id: str, input: BidCreate):
         bidder_type=input.bidder_type,
         amount=input.amount,
         created_at=now,
+        bidder_code=buyer.get("buyer_code", buyer["id"][-7:]),
     )
-    await db.bids.insert_one(bid.model_dump())
+    bid_document = bid.model_dump() | {"ip_address": request.client.host if request.client else "unknown"}
+    await db.bids.insert_one(bid_document)
+    if 0 <= (lot["auction_end"] - now.replace(tzinfo=None)).total_seconds() <= 30:
+        extended_end = lot["auction_end"] + timedelta(seconds=30)
+        await db.lots.update_one({"id": lot_id, "auction_end": lot["auction_end"]}, {"$set": {"auction_end": extended_end}})
     return bid
 
 

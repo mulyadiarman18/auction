@@ -19,7 +19,10 @@ def test_bid_on_live_mining_lot_updates_highest_bid(client: httpx.Client):
     increment = lot_before["minimum_increment"]
     new_amount = current_bid + increment
 
-    bidder_name = "tscheck-bidder-mining-01"
+    # Bidding now requires full eligibility (APPROVED + membership ACTIVE + deposit
+    # CONFIRMED) per the newer "Backend memblokir bidding tanpa eligibility lengkap"
+    # criterion, so this uses the seeded eligible member instead of an arbitrary name.
+    bidder_name = "Budi Santoso"
     resp = client.post(
         f"/lots/{lot_id}/bids",
         json={"amount": new_amount, "bidder_name": bidder_name, "bidder_type": "Verified Bidder VIP"},
@@ -54,7 +57,7 @@ def test_bid_rejected_on_non_live_lot(client: httpx.Client):
 
     resp = client.post(
         f"/lots/{lot_id}/bids",
-        json={"amount": new_amount, "bidder_name": "tscheck-bidder-mining-02", "bidder_type": "Verified Bidder VIP"},
+        json={"amount": new_amount, "bidder_name": "Budi Santoso", "bidder_type": "Verified Bidder VIP"},
     )
     assert resp.status_code >= 400, (
         f"expected rejection for bidding on non-LIVE lot {lot_id}, got {resp.status_code}: {resp.text}"

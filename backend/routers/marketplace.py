@@ -46,7 +46,8 @@ async def register_buyer(input: BuyerRegistrationCreate):
     existing = await db.buyers.find_one({"email": email})
     if existing:
         return BuyerProfile(**existing)
-    draft = input.model_dump(exclude={"email"}) | {"email": email, "documents": []}
+    buyer_number = await db.buyers.count_documents({}) + 1
+    draft = input.model_dump(exclude={"email"}) | {"email": email, "documents": [], "buyer_code": f"MPI-{buyer_number:03d}"}
     screening_status, screening_issues = screen_buyer(draft)
     profile = BuyerProfile(**draft, screening_status=screening_status, screening_issues=screening_issues, verification_status="INCOMPLETE", created_at=datetime.now(timezone.utc))
     await db.buyers.insert_one(profile.model_dump())

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Literal
 import uuid
@@ -37,6 +39,18 @@ class BuyerProfile(BaseModel):
     reviewed_by: str | None = None
     review_reason: str | None = None
     resubmission_required: bool = False
+    membership_status: Literal["INACTIVE", "ACTIVE"] = "INACTIVE"
+    deposit_status: Literal["NOT_SUBMITTED", "PENDING", "CONFIRMED", "REJECTED"] = "NOT_SUBMITTED"
+    deposit_amount: int = 3_000_000
+    deposit_document: DepositDocument | None = None
+    deposit_reviewed_at: datetime | None = None
+    deposit_reviewed_by: str | None = None
+    deposit_review_reason: str | None = None
+    buyer_code: str = ""
+    membership_fee: int = 2_000_000
+    membership_payment_status: Literal["NOT_SUBMITTED", "PENDING", "CONFIRMED", "REJECTED"] = "NOT_SUBMITTED"
+    membership_document: DepositDocument | None = None
+    membership_expires_at: datetime | None = None
 
 
 class BuyerVerificationUpdate(BaseModel):
@@ -71,6 +85,15 @@ class BuyerDocument(BaseModel):
     uploaded_at: datetime
 
 
+class DepositDocument(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    file_name: str
+    content_type: str
+    size_bytes: int
+    storage_id: str
+    uploaded_at: datetime
+
+
 class BuyerStatusResponse(BaseModel):
     found: bool
     profile: BuyerProfile | None = None
@@ -83,7 +106,7 @@ class AdminAuditLog(BaseModel):
     entity_name: str
     action: Literal["APPROVE", "REJECT"]
     admin_name: str
-    admin_role: Literal["super_admin", "reviewer"]
+    admin_role: Literal["super_admin", "reviewer", "finance", "inspector"]
     old_status: str
     new_status: str
     reason: str
@@ -94,7 +117,7 @@ class AdminUserPublic(BaseModel):
     id: str
     username: str
     name: str
-    role: Literal["super_admin", "reviewer"]
+    role: Literal["super_admin", "reviewer", "finance", "inspector"]
     is_active: bool = True
 
 

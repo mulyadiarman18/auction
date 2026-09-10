@@ -48,3 +48,15 @@ async def require_super_admin(current: AdminUserPublic = Depends(get_current_adm
     if current.role != "super_admin":
         raise HTTPException(status_code=403, detail="Aksi ini hanya tersedia untuk Super Admin")
     return current
+
+
+async def require_finance(current: AdminUserPublic = Depends(get_current_admin)) -> AdminUserPublic:
+    if current.role not in {"finance", "super_admin"}:
+        raise HTTPException(status_code=403, detail="Aksi ini hanya tersedia untuk Finance")
+    return current
+
+
+async def require_inspector(current: AdminUserPublic = Depends(get_current_admin)) -> AdminUserPublic:
+    if current.role not in {"inspector", "super_admin"}:
+        raise HTTPException(status_code=403, detail="Aksi ini hanya tersedia untuk Inspektor")
+    return current

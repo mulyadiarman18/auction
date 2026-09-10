@@ -74,7 +74,7 @@ async def update_buyer_verification(buyer_id: str, input: BuyerVerificationUpdat
     now = datetime.now(timezone.utc)
     document = await db.buyers.find_one_and_update(
         {"id": buyer_id, "verification_status": "PENDING"},
-        {"$set": {"verification_status": input.verification_status, "reviewed_at": now, "reviewed_by": current.name, "review_reason": input.reason.strip() or "Data terverifikasi", "resubmission_required": input.verification_status == "REJECTED"}},
+        {"$set": {"verification_status": input.verification_status, "membership_status": buyer.get("membership_status", "INACTIVE"), "reviewed_at": now, "reviewed_by": current.name, "review_reason": input.reason.strip() or "Data terverifikasi", "resubmission_required": input.verification_status == "REJECTED"}},
         return_document=ReturnDocument.AFTER,
     )
     if not document:

@@ -17,6 +17,11 @@ from routers.auction import bids_router, router as auction_router
 from routers.admin import router as admin_router
 from routers.admin_auth import router as admin_auth_router
 from routers.marketplace import buyers_router, wishlist_router
+from routers.sessions import admin_router as admin_sessions_router, router as sessions_router
+from routers.deposits import admin_membership_router, admin_router as admin_deposits_router, membership_router, router as deposits_router
+from routers.vendors import router as vendors_router
+from routers.transactions import admin_router as admin_invoices_router, router as transactions_router
+from routers.inspections import router as inspections_router
 
 
 # Startup runs before the yield, shutdown after it. Add your own setup/teardown here.
@@ -45,6 +50,16 @@ api_router.include_router(buyers_router)
 api_router.include_router(wishlist_router)
 api_router.include_router(admin_router)
 api_router.include_router(admin_auth_router)
+api_router.include_router(sessions_router)
+api_router.include_router(admin_sessions_router)
+api_router.include_router(deposits_router)
+api_router.include_router(admin_deposits_router)
+api_router.include_router(vendors_router)
+api_router.include_router(membership_router)
+api_router.include_router(admin_membership_router)
+api_router.include_router(transactions_router)
+api_router.include_router(admin_invoices_router)
+api_router.include_router(inspections_router)
 
 app.add_middleware(
     CORSMiddleware,

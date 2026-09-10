@@ -37,6 +37,14 @@ INDEXES: dict[str, list[IndexModel]] = {
         IndexModel([("token_hash", ASCENDING)], name="session_token", unique=True),
         IndexModel([("expires_at", ASCENDING)], name="session_expiry", expireAfterSeconds=0),
     ],
+    "auction_sessions": [
+        IndexModel([("code", ASCENDING)], name="auction_session_code", unique=True),
+        IndexModel([("start_at", ASCENDING), ("status", ASCENDING)], name="auction_session_schedule"),
+    ],
+    "vendors": [IndexModel([("email", ASCENDING)], name="vendor_email", unique=True)],
+    "vendor_units": [IndexModel([("vendor_id", ASCENDING), ("created_at", DESCENDING)], name="vendor_units_created")],
+    "invoices": [IndexModel([("invoice_number", ASCENDING)], name="invoice_number", unique=True), IndexModel([("buyer_id", ASCENDING), ("created_at", DESCENDING)], name="buyer_invoices")],
+    "inspections": [IndexModel([("inspector_name", ASCENDING), ("planned_at", DESCENDING)], name="inspector_tasks")],
 }
 
 

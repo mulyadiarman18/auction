@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
-import { Bell, ChevronDown, LayoutDashboard, MapPin, Pickaxe, Search, ShoppingBag, UserRound } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Bell, ChevronDown, LayoutDashboard, MapPin, Search, ShoppingBag, UserRound } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { Bidder } from "@/types/auction";
+import { apiGet } from "@/lib/api";
+import type { AdminUser, Bidder } from "@/types/auction";
 
 interface MarketHeaderProps {
   bidder: Bidder;
@@ -20,13 +22,14 @@ export function AuctionHeader({ bidder, onBidderChange, search = "", onSearchCha
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
   const isAdmin = location.pathname.startsWith("/admin");
+  const adminSession = useQuery({ queryKey: ["admin-session"], queryFn: () => apiGet<AdminUser>("/admin/auth/me"), enabled: isAdmin, retry: false });
+  const adminRole = adminSession.data?.role;
   const bidderOptions = defaultBidderOptions.some((option) => option.name === bidder.name) ? defaultBidderOptions : [bidder, ...defaultBidderOptions];
 
   return (
     <header data-testid="auction-header" className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
       <div className="mx-auto flex max-w-[1240px] items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/" data-testid="navbar-brand-logo" className="flex shrink-0 items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F5B800] text-[#202124]"><Pickaxe size={20} strokeWidth={2.4} /></span>
           <span data-testid="navbar-brand-name" className="font-heading text-xl font-bold tracking-[-0.05em] text-[#202124]">MIT <span className="text-[#B77900]">Auction</span></span>
         </Link>
 
@@ -50,7 +53,7 @@ export function AuctionHeader({ bidder, onBidderChange, search = "", onSearchCha
         <Link data-testid="header-dashboard-button" to="/dashboard" className={buttonVariants({ size: "sm", className: `hidden gap-1.5 bg-[#202124] text-white hover:bg-black sm:inline-flex ${isDashboard ? "ring-2 ring-[#F5B800]/40" : ""}` })}><LayoutDashboard size={15} /> <span className="hidden lg:inline">Dashboard</span></Link>
       </div>
       <nav data-testid="marketplace-navigation" className="hidden border-t border-slate-100 sm:block">
-        <div className="mx-auto flex max-w-[1240px] items-center gap-6 px-4 py-2.5 text-xs text-slate-500 sm:px-6 lg:px-8"><Link data-testid="navigation-catalog-link" to="/#catalog" className="font-semibold text-slate-700 hover:text-[#B77900]">Katalog unit</Link><Link data-testid="navigation-live-link" to="/?status=LIVE#catalog" className="hover:text-[#B77900]">Lelang berjalan</Link><Link data-testid="navigation-how-it-works-link" to="/#how-it-works" className="hover:text-[#B77900]">Cara ikut lelang</Link><Link data-testid="navigation-register-link" to="/register" className="hover:text-[#B77900]">Daftar member</Link>{isAdmin && <Link data-testid="navigation-admin-approvals-link" to="/admin/approvals" className="font-semibold text-[#B77900]">Approval bidder</Link>}<span data-testid="marketplace-shipping-note" className="ml-auto flex items-center gap-1.5 text-slate-400"><Badge data-testid="marketplace-live-badge" className="bg-[#FFF4C2] px-1.5 py-0 text-[9px] text-[#8A5B00] hover:bg-[#FFF4C2]">LIVE</Badge> Jadwal lelang 2× seminggu</span></div>
+        <div className="mx-auto flex max-w-[1240px] items-center gap-6 px-4 py-2.5 text-xs text-slate-500 sm:px-6 lg:px-8"><Link data-testid="navigation-catalog-link" to="/#catalog" className="font-semibold text-slate-700 hover:text-[#B77900]">Katalog unit</Link><Link data-testid="navigation-sessions-link" to="/sessions" className="hover:text-[#B77900]">Jadwal lelang</Link>{!isAdmin && <><Link data-testid="navigation-how-it-works-link" to="/#how-it-works" className="hover:text-[#B77900]">Cara ikut lelang</Link><Link data-testid="navigation-register-link" to="/register" className="hover:text-[#B77900]">Daftar member</Link><Link data-testid="navigation-seller-link" to="/seller" className="hover:text-[#B77900]">Portal vendor</Link></>}{isAdmin && (adminRole === "super_admin" || adminRole === "reviewer") && <Link data-testid="navigation-admin-approvals-link" to="/admin/approvals" className="font-semibold text-[#B77900]">Approval legalitas</Link>}{isAdmin && adminRole === "super_admin" && <><Link data-testid="navigation-admin-operations-link" to="/admin/operations" className="font-semibold text-[#B77900]">Operasional</Link><Link data-testid="navigation-admin-inspections-link" to="/admin/inspections" className="font-semibold text-[#B77900]">Inspeksi</Link></>}{isAdmin && (adminRole === "super_admin" || adminRole === "finance") && <Link data-testid="navigation-admin-finance-link" to="/admin/finance" className="font-semibold text-[#B77900]">Finance</Link>}{isAdmin && adminRole === "inspector" && <Link data-testid="navigation-inspector-link" to="/admin/inspections" className="font-semibold text-[#B77900]">Tugas inspeksi</Link>}<span data-testid="marketplace-shipping-note" className="ml-auto flex items-center gap-1.5 text-slate-400"><Badge data-testid="marketplace-live-badge" className="bg-[#FFF4C2] px-1.5 py-0 text-[9px] text-[#8A5B00] hover:bg-[#FFF4C2]">LIVE</Badge> Selasa & Jumat</span></div>
       </nav>
     </header>
   );

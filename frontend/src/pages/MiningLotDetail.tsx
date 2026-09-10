@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Check, FileCheck2, Gauge, MapPin, ShieldCheck } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { AuctionHeader } from "@/components/auction/MarketHeader";
-import { MarketBidPanel } from "@/components/auction/MarketBidPanel";
+import { MiningBidPanel as MarketBidPanel } from "@/components/auction/MiningBidPanel";
 import { Badge } from "@/components/ui/badge";
 import { apiGet } from "@/lib/api";
 import type { Bid, Bidder, Lot } from "@/types/auction";

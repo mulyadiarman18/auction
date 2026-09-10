@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timedelta, timezone
 
 from lib.db import client, db, ensure_indexes
+from lib.dates import default_auction_slots
 
 
 IMAGE_URLS = {
@@ -84,12 +85,61 @@ async def seed() -> None:
             "auction_code": "LLG-20260912-01", "unit_number": "WLD-034", "hull_number": "980M-034", "registration_code": "MPI-ORI-034", "brand": "Caterpillar", "model_type": "980M", "operating_hours": "8.640 HM", "seller_name": "PT Mitra Tambang Sejahtera", "pool_location": "Pool Banjarmasin", "document_completeness": ["Faktur", "Form A", "Manual book", "Laporan inspeksi"],
         },
     ]
+    slots = default_auction_slots(4, include_previous=True)
+    sessions = []
+    lot_groups = [["lot-005"], [], ["lot-001", "lot-003"], ["lot-002", "lot-004", "lot-006"]]
+    for index, slot in enumerate(slots):
+        sessions.append({
+            "id": f"session-{index + 1:03d}",
+            "code": f"MIT-{slot['local_date'].replace('-', '')}",
+            "title": f"Lelang Reguler {slot['local_date']}",
+            "start_at": slot["start_at"],
+            "end_at": slot["end_at"],
+            "publication_at": slot["publication_at"],
+            "status": slot["status"],
+            "lot_ids": lot_groups[index],
+            "created_at": now,
+        })
+    session_by_lot = {lot_id: session["id"] for session in sessions for lot_id in session["lot_ids"]}
+    for lot in lots:
+        lot["session_id"] = session_by_lot.get(lot["id"])
+        lot["reserve_price"] = round(lot["base_price"] * 1.08)
+        lot["inspection_status"] = "COMPLETED"
+        lot["unit_status"] = "SOLD" if lot["status"] == "ENDED" else "IN_AUCTION" if lot["status"] == "LIVE" else "READY"
+
+    buyers = [
+        {"id": "buyer-budi", "buyer_code": "MPI-001", "buyer_type": "individual", "full_name": "Budi Santoso", "email": "budi.member@mit-auction.demo", "phone": "081211110001", "identity_number": "3174000000001001", "company_name": None, "tax_number": "", "address": "Jakarta Selatan", "verification_status": "APPROVED", "screening_status": "READY", "screening_issues": [], "documents": [], "created_at": now, "reviewed_at": now, "reviewed_by": "Dina Super Admin", "review_reason": "Demo member terverifikasi", "resubmission_required": False, "membership_status": "ACTIVE", "membership_fee": 2000000, "membership_payment_status": "CONFIRMED", "membership_document": None, "membership_expires_at": now + timedelta(days=365), "deposit_status": "CONFIRMED", "deposit_amount": 3000000, "deposit_document": None, "deposit_reviewed_at": now, "deposit_reviewed_by": "Fina Finance MPI", "deposit_review_reason": "Deposit demo terkonfirmasi"},
+        {"id": "buyer-siti", "buyer_code": "MPI-002", "buyer_type": "individual", "full_name": "Siti Rahma", "email": "siti.member@mit-auction.demo", "phone": "081211110002", "identity_number": "3174000000001002", "company_name": None, "tax_number": "", "address": "Bandung", "verification_status": "APPROVED", "screening_status": "READY", "screening_issues": [], "documents": [], "created_at": now, "reviewed_at": now, "reviewed_by": "Raka Reviewer", "review_reason": "Demo member terverifikasi", "resubmission_required": False, "membership_status": "ACTIVE", "membership_fee": 2000000, "membership_payment_status": "CONFIRMED", "membership_document": None, "membership_expires_at": now + timedelta(days=365), "deposit_status": "NOT_SUBMITTED", "deposit_amount": 3000000, "deposit_document": None, "deposit_reviewed_at": None, "deposit_reviewed_by": None, "deposit_review_reason": None},
+    ]
+    vendor = {"id": "vendor-demo-001", "seller_code": "SLR-001", "company_name": "PT Karya Mineral Nusantara", "tax_number": "01.234.567.8-091.000", "address": "Balikpapan, Kalimantan Timur", "pic_name": "Andi Pratama", "email": "vendor@karyamineral.demo", "phone": "081355500100", "legality_status": "APPROVED", "pks_status": "ACTIVE", "admin_fee_percent": 1.5, "contract_number": "PKS/MIT/2026/001", "contract_start": now - timedelta(days=90), "contract_end": now + timedelta(days=275), "pool_address": "Pool Balikpapan KM 18", "pool_pic": "Hendra Gunawan", "settlement_terms": "3 hari kerja setelah pelunasan pembeli", "documents": [], "created_at": now}
+    vendor_units = [
+        {"id": "vendor-unit-001", "vendor_id": vendor["id"], "unit_name": "Komatsu PC400LC-8 Hydraulic Excavator", "category": "Excavator", "brand": "Komatsu", "model_type": "PC400LC-8", "year": 2019, "unit_number": "EXC-041", "hull_number": "PC400-041", "operating_hours": "12.480 HM", "pool_location": "Pool Sangatta", "proposed_price": 1850000000, "status": "LOTTED", "settlement_status": "PENDING", "winning_bid": 2260000000, "created_at": now - timedelta(days=14)},
+        {"id": "vendor-unit-002", "vendor_id": vendor["id"], "unit_name": "Komatsu D155A-6 Crawler Dozer", "category": "Bulldozer", "brand": "Komatsu", "model_type": "D155A-6", "year": 2019, "unit_number": "DZR-063", "hull_number": "D155-063", "operating_hours": "11.350 HM", "pool_location": "Pool Balikpapan", "proposed_price": 2400000000, "status": "APPROVED", "settlement_status": "NONE", "winning_bid": None, "created_at": now - timedelta(days=7)},
+    ]
+    invoices = [{"id": "invoice-demo-001", "invoice_number": "INV/2026/09/0001", "buyer_id": "buyer-budi", "bidder_name": "Budi Santoso", "lot_id": "lot-005", "lot_title": "Volvo A40G Articulated Hauler", "hammer_price": 2175000000, "deposit_deduction": 3000000, "buyer_admin_fee": 0, "tax_amount": 0, "total_due": 2172000000, "due_at": now + timedelta(days=3), "status": "PENDING_PAYMENT", "payment_document": None, "created_at": now}]
+    inspections = [
+        {"id": "inspection-001", "lot_id": "lot-001", "inspector_name": "Indra Inspektor", "planned_at": now - timedelta(days=4), "status": "COMPLETED", "component_scores": {"eksterior": 86, "interior": 88, "mesin": 90, "kaki_kaki": 82, "kelistrikan": 89, "kelengkapan": 87, "pembacaan": 88}, "notes": "Unit operasional, undercarriage perlu monitoring.", "total_score": 87, "suggested_grade": "A", "completed_at": now - timedelta(days=3)},
+        {"id": "inspection-002", "lot_id": "lot-002", "inspector_name": "Indra Inspektor", "planned_at": now + timedelta(days=1), "status": "SCHEDULED", "component_scores": {}, "notes": "", "total_score": None, "suggested_grade": None, "completed_at": None},
+    ]
+
     await db.bids.delete_many({})
     await db.lots.delete_many({})
     await db.lots.insert_many(lots)
+    await db.auction_sessions.delete_many({})
+    await db.auction_sessions.insert_many(sessions)
+    await db.buyers.delete_many({"full_name": {"$in": ["Budi Santoso", "Siti Rahma"]}})
+    await db.buyers.insert_many(buyers)
+    await db.vendors.delete_many({})
+    await db.vendor_units.delete_many({})
+    await db.vendors.insert_one(vendor)
+    await db.vendor_units.insert_many(vendor_units)
+    await db.invoices.delete_many({})
+    await db.invoices.insert_many(invoices)
+    await db.inspections.delete_many({})
+    await db.inspections.insert_many(inspections)
     await ensure_indexes()
     client.close()
-    print(f"Seeded {len(lots)} auction lots")
+    print(f"Seeded {len(lots)} lots, {len(sessions)} sessions, {len(buyers)} members, and 1 vendor")
 
 
 if __name__ == "__main__":

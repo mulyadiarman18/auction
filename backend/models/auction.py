@@ -43,6 +43,10 @@ class Lot(BaseModel):
     seller_name: str = "MPI Verified Vendor"
     pool_location: str = ""
     document_completeness: list[str] = Field(default_factory=list)
+    session_id: str | None = None
+    unit_status: Literal["DRAFT", "VERIFIED", "READY", "IN_AUCTION", "SOLD", "UNSOLD", "HANDED_OVER", "WITHDRAWN"] = "READY"
+    inspection_status: Literal["UNSCHEDULED", "SCHEDULED", "IN_PROGRESS", "COMPLETED", "REJECTED"] = "COMPLETED"
+    reserve_price: int = 0
 
 
 class BidCreate(BaseModel):
@@ -59,3 +63,4 @@ class Bid(BaseModel):
     amount: int
     created_at: datetime
     status: Literal["VALID", "OUTBID"] = "VALID"
+    bidder_code: str = ""

@@ -32,3 +32,19 @@ Six mining-equipment lots are written by `backend/seed.py`: Komatsu excavator an
 - Admin routes now require a Mongo-backed HTTP-only session created by `/api/admin/auth/login`; role comes from the authenticated account, not a client selector.
 - Rejected bidders can open `/resubmit/{buyerId}` from the dashboard, correct their data, upload a replacement identity document, and return to `PENDING` after screening.
 - Reviewer document links open PDF/JPG/PNG inside an authenticated modal preview rather than downloading immediately.
+
+## Auction sessions, deposit, and seller operations
+- `/sessions` publishes recurring Tuesday/Friday 10:00-15:00 WIB auction sessions. Each session stores an H-3 publication time and a list of lotted lot IDs; Super Admin manages these from `/admin/operations`.
+- Backend bid placement now requires the latest buyer profile to be `APPROVED`, membership `ACTIVE`, and deposit `CONFIRMED`. `/deposits/access` is the shared source of truth for UI and API eligibility.
+- Member dashboard supports real PDF/JPG/PNG transfer-proof upload for the fixed Rp3,000,000 deposit. Super Admin previews and confirms/rejects pending proofs from `/admin/operations`.
+- Seeded persona `Budi Santoso` is fully eligible; `Siti Rahma` is approved/active but must submit and receive deposit confirmation before bidding.
+- `/seller` is a persisted demo-vendor portal for legal status, PKS upload, unit submission, and settlement visibility. Vendor authentication is intentionally deferred.
+
+## Latest PRD P0 alignment
+- Buyer codes use `MPI-###`. Bidding requires legal approval, a confirmed non-refundable Rp2,000,000 membership payment, active membership, and a confirmed global Rp3,000,000 deductible deposit.
+- Finance is a separate authenticated role and is the only operational role (besides Super Admin) allowed to confirm membership payments, deposits, and winner payments.
+- Bid history shown to participants is anonymized (`Bidder #…`). Bid writes remain append-only, use atomic current-price matching, store millisecond timestamps/IP metadata, and extend a lot by 30 seconds when a valid bid arrives inside the last 30 seconds.
+- Winner invoices deduct the confirmed deposit from hammer price. Members upload settlement proof; Finance confirms payment manually.
+- Vendor unit submission is blocked unless legal status is `APPROVED` and PKS is `ACTIVE`. Seeded PKS includes contract number/dates, pool, 1.5% seller fee, and settlement terms; seller settlement output shows fee and net value.
+- Inspector is a separate authenticated role with owned tasks, seven-component scoring, front-photo upload, automatic A–D grading, and unit inspection status updates.
+- Bidding UI polls lot and anonymized bid state every second as the MVP real-time transport; WebSocket fan-out remains a production enhancement.

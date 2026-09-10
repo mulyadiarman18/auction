@@ -11,7 +11,7 @@ import { apiGet, apiPatch } from "@/lib/api";
 import type { AdminAuditLog, AdminRole, Bidder, BuyerProfile, BuyerVerificationUpdate } from "@/types/auction";
 
 interface MarketplaceAdminApprovalsV2Props { bidder: Bidder; onBidderChange: (bidder: Bidder) => void; adminRole: AdminRole; onAdminRoleChange: (role: AdminRole) => void }
-const adminNames: Record<AdminRole, string> = { super_admin: "Dina Super Admin", reviewer: "Raka Reviewer" };
+const adminNames: Record<AdminRole, string> = { super_admin: "Dina Super Admin", reviewer: "Raka Reviewer", finance: "Fina Finance MPI", inspector: "Indra Inspektor" };
 
 export default function MarketplaceAdminApprovalsV2({ bidder, onBidderChange, adminRole, onAdminRoleChange }: MarketplaceAdminApprovalsV2Props) {
   const client = useQueryClient(); const [reasons, setReasons] = useState<Record<string, string>>({}); const roleQuery = `admin_role=${adminRole}`;
